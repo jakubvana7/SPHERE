@@ -1,0 +1,17 @@
+# Nette
+/log/*
+!/log/.gitkeep
+/temp/*
+!/temp/.gitkeep
+/vendor/
+
+# Secrets
+.env
+
+# Composer
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp

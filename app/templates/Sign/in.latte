@@ -1,0 +1,14 @@
+{block title}Sign In{/block}
+
+{block content}
+<div class="min-h-[80vh] flex items-center justify-center px-6">
+    <div class="w-full max-w-sm">
+        <h1 class="text-xs font-black tracking-[0.4em] uppercase mb-2 text-center">Sign In</h1>
+        <p class="text-xs text-gray-400 text-center mb-10">
+            Don't have an account?
+            <a href="{link Sign:register}" class="text-black font-bold underline hover:no-underline">Register</a>
+        </p>
+        {control loginForm}
+    </div>
+</div>
+{/block}

@@ -1,0 +1,205 @@
+{block title}{$shoe->shoeName}{/block}
+
+{block content}
+<div class="max-w-6xl mx-auto px-6 py-10">
+
+    {* Breadcrumb *}
+    <nav class="flex items-center gap-2 text-[11px] text-gray-400 tracking-wider uppercase mb-10">
+        <a href="{link Homepage:default}" class="hover:text-black transition-colors">Home</a>
+        <span class="text-gray-200">/</span>
+        {if $shoe->IDB <= 10}
+        <a href="{link Men:default}" class="hover:text-black transition-colors">Men</a>
+        {else}
+        <a href="{link Women:default}" class="hover:text-black transition-colors">Women</a>
+        {/if}
+        <span class="text-gray-200">/</span>
+        <span class="text-gray-600 truncate max-w-[200px]">{$shoe->shoeName}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+
+        {* ─── Left: Image gallery ─── *}
+        <div class="lg:sticky lg:top-24">
+            {* Main image *}
+            <div class="relative bg-white border border-gray-100 overflow-hidden rounded-sm shadow-sm" style="aspect-ratio:1/1;" id="slideshow">
+                <img src="{$shoe->img1|img}" alt="{$shoe->shoeName}"
+                     class="slide absolute inset-0 w-full h-full object-contain p-8 transition-opacity duration-300" id="slide-0">
+                <img src="{$shoe->img2|img}" alt="{$shoe->shoeName}"
+                     class="slide absolute inset-0 w-full h-full object-contain p-8 transition-opacity duration-300 opacity-0" id="slide-1">
+                <img src="{$shoe->img3|img}" alt="{$shoe->shoeName}"
+                     class="slide absolute inset-0 w-full h-full object-contain p-8 transition-opacity duration-300 opacity-0" id="slide-2">
+            </div>
+
+            {* Thumbnails *}
+            <div class="flex gap-2 mt-3">
+                {foreach [$shoe->img1, $shoe->img2, $shoe->img3] as $i => $img}
+                <button onclick="showSlide({$i})" id="thumb-{$i}"
+                        class="flex-1 bg-white border border-gray-100 overflow-hidden rounded-sm transition-all hover:border-gray-300"
+                        style="aspect-ratio:1/1;">
+                    <img src="{$img|img}" alt="" class="w-full h-full object-contain p-3">
+                </button>
+                {/foreach}
+            </div>
+        </div>
+
+        {* ─── Right: Product info ─── *}
+        <div class="flex flex-col gap-8 py-2">
+
+            {* Name & price *}
+            <div>
+                <p class="text-[11px] font-bold tracking-[0.3em] uppercase text-gray-400 mb-2">
+                    {if $shoe->IDB <= 10}Men's{else}Women's{/if}
+                </p>
+                <h1 class="text-3xl font-black leading-tight tracking-tight mb-4">{$shoe->shoeName}</h1>
+                <p class="text-2xl font-light tracking-wide">{$shoe->price} €</p>
+            </div>
+
+            {* Description *}
+            <div class="border-t border-gray-100 pt-6">
+                <p class="text-sm text-gray-500 leading-relaxed">{$shoe->popisek}</p>
+            </div>
+
+            {* Add to cart or status *}
+            {if !$shoe->available}
+            <div class="border border-gray-200 bg-gray-50 px-5 py-4 text-[11px] text-gray-500 tracking-[0.2em] uppercase font-bold">
+                This product is currently unavailable
+            </div>
+
+            {elseif $isSoldOut}
+            <div class="border border-red-100 bg-red-50 px-5 py-4 text-[11px] text-red-400 tracking-[0.2em] uppercase font-bold">
+                Sold Out
+            </div>
+
+            {else}
+            {* Size tiles + form *}
+            <form n:name="addToCartForm" class="space-y-5">
+
+                {* Hidden select synced by JS *}
+                <select n:name="size" class="hidden" data-size-field></select>
+
+                {* Size section *}
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[11px] font-bold tracking-[0.25em] uppercase">Select Your Size</span>
+                        <span class="text-[11px] text-gray-400" id="selected-size-label"></span>
+                    </div>
+
+                    {* Size error *}
+                    <p id="size-error" class="text-xs text-red-500 mb-3 hidden">Please select a size before adding to cart.</p>
+
+                    <div class="grid grid-cols-5 gap-2">
+                        {foreach $allSizes as $s}
+                        {var $inStock = $s->stock > 0}
+                        {if $inStock}
+                        <button type="button"
+                                data-size="{$s->size}"
+                                onclick="selectSize(this)"
+                                class="size-tile relative border border-gray-200 py-3 text-xs font-bold tracking-wide hover:border-black transition-all rounded-sm">
+                            {$s->size|sizeFormat}
+                            {if $s->stock <= 3}
+                            <span class="absolute top-1 right-1 w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
+                            {/if}
+                        </button>
+                        {else}
+                        <div class="relative border border-gray-100 py-3 text-xs font-bold tracking-wide text-gray-300 text-center rounded-sm cursor-not-allowed select-none overflow-hidden">
+                            {$s->size|sizeFormat}
+                            <span class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span class="block w-full border-t border-gray-200" style="transform:rotate(-20deg)"></span>
+                            </span>
+                        </div>
+                        {/if}
+                        {/foreach}
+                    </div>
+
+                    {var $hasLowStock = false}
+                    {foreach $availableSizes as $s}{if $s->stock <= 3}{var $hasLowStock = true}{/if}{/foreach}
+                    {if $hasLowStock}
+                    <p class="text-[11px] text-gray-400 mt-2">
+                        <span class="w-1.5 h-1.5 bg-amber-400 rounded-full inline-block mr-1 align-middle"></span>
+                        Low stock
+                    </p>
+                    {/if}
+                </div>
+
+                {* Submit *}
+                <input n:name="addToCart"
+                       class="w-full bg-black text-white py-4 text-[11px] font-bold tracking-[0.35em] uppercase hover:bg-gray-800 active:scale-[0.99] transition-all cursor-pointer">
+
+            </form>
+            {/if}
+
+            {* Trust badges *}
+            <div class="border-t border-gray-100 pt-6 grid grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12a2 2 0 002 2h8a2 2 0 002-2L19 8m-9 4v4m4-4v4"/></svg>
+                    <div>
+                        <p class="text-[11px] font-bold tracking-wider uppercase">Free Shipping</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">On all orders</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 15v-1a4 4 0 00-8 0v1m0 0H5l1 5h12l1-5h-3zm-4-5a3 3 0 100-6 3 3 0 000 6z"/></svg>
+                    <div>
+                        <p class="text-[11px] font-bold tracking-wider uppercase">Free Returns</p>
+                        <p class="text-[11px] text-gray-400 mt-0.5">30-day window</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .slide { pointer-events: none; }
+    .size-tile.selected { background: black; color: white; border-color: black; }
+    .thumb-active { outline: 2px solid black; outline-offset: 2px; }
+</style>
+
+<script>
+// ── Slideshow ──────────────────────────────────────────────
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const thumbs = document.querySelectorAll('[id^="thumb-"]');
+
+function showSlide(n) {
+    slides[current].classList.add('opacity-0');
+    thumbs[current].classList.remove('thumb-active');
+    current = n;
+    slides[current].classList.remove('opacity-0');
+    thumbs[current].classList.add('thumb-active');
+}
+thumbs[0] && thumbs[0].classList.add('thumb-active');
+
+let autoSlide = setInterval(() => showSlide((current + 1) % slides.length), 4500);
+thumbs.forEach((t, i) => t.addEventListener('click', () => {
+    clearInterval(autoSlide);
+    showSlide(i);
+}));
+
+// ── Size tiles ─────────────────────────────────────────────
+const sizeField = document.querySelector('[data-size-field]');
+const sizeError = document.getElementById('size-error');
+const selectedLabel = document.getElementById('selected-size-label');
+
+function selectSize(btn) {
+    document.querySelectorAll('.size-tile').forEach(t => t.classList.remove('selected'));
+    btn.classList.add('selected');
+    if (sizeField) sizeField.value = btn.dataset.size;
+    if (sizeError) sizeError.classList.add('hidden');
+    if (selectedLabel) selectedLabel.textContent = 'EU ' + btn.textContent.trim();
+}
+
+// Validate before submit
+const cartForm = sizeField && sizeField.closest('form');
+if (cartForm) {
+    cartForm.addEventListener('submit', e => {
+        if (!sizeField.value) {
+            e.preventDefault();
+            if (sizeError) sizeError.classList.remove('hidden');
+            document.querySelector('.size-tile') && document.querySelector('.size-tile').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+}
+</script>
+{/block}

@@ -1,0 +1,84 @@
+{block title}My Account{/block}
+
+{block content}
+<div class="max-w-4xl mx-auto px-6 py-16">
+
+    {* Account header *}
+    <div class="flex items-start justify-between mb-14 pb-8 border-b border-gray-100">
+        <div>
+            <h1 class="text-xs font-black tracking-[0.4em] uppercase mb-1">My Account</h1>
+            <p class="text-sm text-gray-500">{$userInfo->name}</p>
+            <p class="text-xs text-gray-400">{$userInfo->email}</p>
+        </div>
+        <a href="{link Sign:out}" class="text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-black transition-colors">
+            Logout
+        </a>
+    </div>
+
+    {* Orders *}
+    <h2 class="text-xs font-black tracking-[0.35em] uppercase mb-8">My Orders</h2>
+
+    {if count($orders) === 0}
+    <div class="text-center py-20">
+        <p class="text-sm text-gray-400 mb-6">You have no orders yet.</p>
+        <a href="{link Homepage:default}"
+           class="inline-block bg-black text-white px-8 py-3 text-xs font-bold tracking-[0.3em] uppercase hover:bg-gray-800 transition-colors">
+            Go to Store
+        </a>
+    </div>
+    {else}
+    <div class="space-y-8">
+        {foreach $orders as $entry}
+        {var $order = $entry['order']}
+        {var $items = $entry['items']}
+        <div class="border border-gray-100 rounded-sm overflow-hidden">
+            {* Order header *}
+            <div class="bg-gray-50 px-6 py-4 flex flex-wrap gap-6 text-xs">
+                <div>
+                    <span class="text-gray-400 uppercase tracking-wider">Order #</span>
+                    <span class="font-bold ml-1">{$order->idZ}</span>
+                </div>
+                <div>
+                    <span class="text-gray-400 uppercase tracking-wider">Date</span>
+                    <span class="font-bold ml-1">{$order->created_at|date:'j. n. Y'}</span>
+                </div>
+                <div>
+                    <span class="text-gray-400 uppercase tracking-wider">Payment</span>
+                    <span class="font-bold ml-1 uppercase">{$order->payment_method}</span>
+                </div>
+                <div class="ml-auto">
+                    <span class="text-gray-400 uppercase tracking-wider">Total</span>
+                    <span class="font-bold ml-1">{array_sum(array_column((array)$items, 'price')) + 15} €</span>
+                </div>
+            </div>
+
+            {* Order items *}
+            <div class="divide-y divide-gray-50 px-6">
+                {foreach $items as $item}
+                <div class="flex gap-4 py-4 items-center">
+                    <img src="{$item->img|img}" alt="{$item->shoe_name}"
+                         class="w-16 h-16 object-contain bg-gray-50 rounded-sm flex-shrink-0 p-1">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold leading-snug line-clamp-1">{$item->shoe_name}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Size: {$item->size}</p>
+                    </div>
+                    <p class="text-sm font-bold flex-shrink-0">{$item->price} €</p>
+                </div>
+                {/foreach}
+            </div>
+
+            {* Shipping address *}
+            <div class="border-t border-gray-50 px-6 py-4 bg-gray-50/50">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Shipping Address</p>
+                <p class="text-xs text-gray-700">
+                    {$order->Cname} {$order->surname},
+                    {$order->address1}{$order->address2 ? ', ' . $order->address2 : ''},
+                    {$order->zip} {$order->city}, {$order->country}
+                </p>
+            </div>
+        </div>
+        {/foreach}
+    </div>
+    {/if}
+</div>
+{/block}

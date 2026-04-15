@@ -1,0 +1,61 @@
+{block title}Admin — Products{/block}
+
+{block content}
+<div class="max-w-6xl mx-auto px-6 py-16">
+    <div class="flex items-center justify-between mb-10">
+        <h1 class="text-xs font-black tracking-[0.4em] uppercase">Product Management</h1>
+        <a href="{link Admin:add}" class="bg-black text-white px-6 py-2.5 text-xs font-bold tracking-widest uppercase hover:bg-gray-800 transition-colors">
+            + Add Product
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-left text-xs font-bold tracking-widest uppercase py-3 pr-4 text-gray-500 w-16">ID</th>
+                    <th class="text-left text-xs font-bold tracking-widest uppercase py-3 pr-4 text-gray-500">Preview</th>
+                    <th class="text-left text-xs font-bold tracking-widest uppercase py-3 pr-4 text-gray-500">Name</th>
+                    <th class="text-left text-xs font-bold tracking-widest uppercase py-3 pr-4 text-gray-500">Price</th>
+                    <th class="text-left text-xs font-bold tracking-widest uppercase py-3 pr-4 text-gray-500">Status</th>
+                    <th class="text-right text-xs font-bold tracking-widest uppercase py-3 text-gray-500">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {foreach $shoes as $shoe}
+                <tr class="{if !$shoe->available}opacity-40{/if} hover:bg-gray-50 transition-colors">
+                    <td class="py-3 pr-4 text-gray-400 text-xs">{$shoe->IDB}</td>
+                    <td class="py-3 pr-4">
+                        <img src="{$shoe->img1|img}" alt=""
+                             class="w-14 h-14 object-contain bg-gray-50 rounded-sm">
+                    </td>
+                    <td class="py-3 pr-4 font-medium leading-snug max-w-xs">{$shoe->shoeName|truncate:60}</td>
+                    <td class="py-3 pr-4 font-bold">{$shoe->price} €</td>
+                    <td class="py-3 pr-4">
+                        <a href="{link toggle! $shoe->IDB}"
+                           class="inline-flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase
+                                  {if $shoe->available}text-black{else}text-gray-400{/if}">
+                            <span class="w-2 h-2 rounded-full {if $shoe->available}bg-green-500{else}bg-red-400{/if}"></span>
+                            {if $shoe->available}Available{else}Unavailable{/if}
+                        </a>
+                    </td>
+                    <td class="py-3 text-right">
+                        <div class="flex items-center justify-end gap-4">
+                            <a href="{link Admin:edit $shoe->IDB}"
+                               class="text-xs font-bold tracking-wider uppercase hover:opacity-50 transition-opacity">
+                                Edit
+                            </a>
+                            <a href="{link delete! $shoe->IDB}"
+                               onclick="return confirm('Delete this product?')"
+                               class="text-xs font-bold tracking-wider uppercase text-red-500 hover:text-red-700 transition-colors">
+                                Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+</div>
+{/block}

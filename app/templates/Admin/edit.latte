@@ -1,0 +1,32 @@
+{block title}Edit Product{/block}
+
+{block content}
+<div class="max-w-2xl mx-auto px-6 py-16">
+    <div class="flex items-center gap-6 mb-10">
+        <a href="{link Admin:default}" class="text-xs text-gray-400 hover:text-black transition-colors tracking-wider uppercase">
+            ← Back
+        </a>
+        <h1 class="text-xs font-black tracking-[0.4em] uppercase">
+            {if $shoe !== null}Edit Product{else}Add New Product{/if}
+        </h1>
+    </div>
+
+    {if $shoe !== null}
+    <div class="flex gap-3 mb-8">
+        <img src="{$shoe->img1|img}" alt="" class="w-20 h-20 object-contain bg-white border border-gray-100 rounded-sm p-2">
+        <img src="{$shoe->img2|img}" alt="" class="w-20 h-20 object-contain bg-white border border-gray-100 rounded-sm p-2">
+        <img src="{$shoe->img3|img}" alt="" class="w-20 h-20 object-contain bg-white border border-gray-100 rounded-sm p-2">
+    </div>
+    {/if}
+
+    {control productForm}
+
+    {if $shoe !== null && count($sizes) > 0}
+    <div class="mt-14 border-t border-gray-100 pt-10">
+        <h2 class="text-xs font-black tracking-[0.35em] uppercase mb-1">Inventory</h2>
+        <p class="text-xs text-gray-400 mb-6">Stock quantity per size</p>
+        {control sizesForm}
+    </div>
+    {/if}
+</div>
+{/block}
