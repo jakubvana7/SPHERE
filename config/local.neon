@@ -1,7 +1,4 @@
-# Local development overrides (not committed to git)
-# Copy this to local.neon and adjust values for your environment.
-#
-# database:
-#     dsn: 'mysql:host=localhost;dbname=vanaj;charset=utf8mb4'
-#     user: root
-#     password: ''
+database:
+    dsn: 'mysql:host=localhost;dbname=vanaj;charset=utf8mb4'
+    user: root
+    password: ''

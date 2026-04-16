@@ -3,7 +3,6 @@
 !/log/.gitkeep
 /temp/*
 !/temp/.gitkeep
-/vendor/
 
 # Secrets
 .env
