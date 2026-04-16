@@ -18,7 +18,6 @@ class Authenticator implements IAuthenticator
 
     public function authenticate(string $user, string $password): SimpleIdentity
     {
-        // Admin přihlášení
         if ($user === 'admin') {
             if (!hash_equals($this->adminPassword, $password)) {
                 throw new AuthenticationException('Invalid credentials.', self::InvalidCredential);
@@ -26,7 +25,6 @@ class Authenticator implements IAuthenticator
             return new SimpleIdentity(0, 'admin', ['name' => 'Admin']);
         }
 
-        // Zákaznické přihlášení (email)
         $dbUser = $this->userService->getByEmail($user);
         if (!$dbUser || !$this->passwords->verify($password, $dbUser->password)) {
             throw new AuthenticationException('Invalid email or password.', self::InvalidCredential);

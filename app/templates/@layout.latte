@@ -25,31 +25,25 @@
 </head>
 <body class="bg-white text-black min-h-screen flex flex-col">
 
-<!-- Navigation -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100">
     <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
-        <!-- Left: categories -->
-        <div class="flex gap-10 w-1/3">
+<div class="flex gap-10 w-1/3">
             <a href="{link Men:default}" class="text-[11px] font-bold tracking-[0.2em] uppercase hover:opacity-40 transition-opacity">Men</a>
             <a href="{link Women:default}" class="text-[11px] font-bold tracking-[0.2em] uppercase hover:opacity-40 transition-opacity">Women</a>
         </div>
 
-        <!-- Center: logo -->
-        <a href="{link Homepage:default}" id="logo-link" class="text-2xl font-black tracking-[0.4em] hover:opacity-50 transition-opacity absolute left-1/2 -translate-x-1/2">SPHERE</a>
+<a href="{link Homepage:default}" id="logo-link" class="text-2xl font-black tracking-[0.4em] hover:opacity-50 transition-opacity absolute left-1/2 -translate-x-1/2">SPHERE</a>
 
-        <!-- Right: actions -->
-        <div class="flex gap-8 items-center justify-end w-1/3">
+<div class="flex gap-8 items-center justify-end w-1/3">
 
-            <!-- Search icon -->
-            <button id="search-btn" aria-label="Search" class="hover:opacity-40 transition-opacity">
+<button id="search-btn" aria-label="Search" class="hover:opacity-40 transition-opacity">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
                 </svg>
             </button>
 
-            <!-- Cart -->
-            <a href="{link Cart:default}" class="relative hover:opacity-40 transition-opacity">
+<a href="{link Cart:default}" class="relative hover:opacity-40 transition-opacity">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
@@ -58,8 +52,7 @@
                 {/if}
             </a>
 
-            <!-- Account -->
-            {if $user->isLoggedIn()}
+{if $user->isLoggedIn()}
                 {if $user->isInRole('admin')}
                 <div class="relative" id="admin-menu-wrap">
                     <button id="admin-menu-btn" class="text-[11px] font-bold tracking-[0.2em] uppercase hover:opacity-40 transition-opacity text-gray-400 flex items-center gap-1">
@@ -98,7 +91,6 @@
     </nav>
 </header>
 
-<!-- Search overlay -->
 <div id="search-overlay" class="fixed inset-0 z-[100] bg-white hidden flex-col">
     <div class="max-w-2xl mx-auto w-full px-6 pt-24 pb-6">
         <div class="flex items-center gap-4 border-b-2 border-black pb-3">
@@ -116,7 +108,6 @@
     </div>
 </div>
 
-{* Flash messages *}
 {foreach $flashes as $flash}
 <div n:class="'fixed top-20 left-1/2 -translate-x-1/2 z-[90] px-8 py-3 shadow-lg text-white text-[11px] font-bold tracking-widest uppercase',
     $flash->type === 'success' ? 'bg-black' : ($flash->type === 'error' ? 'bg-red-600' : 'bg-gray-600')"
@@ -161,16 +152,15 @@
         &copy; 2026 SPHERE. All rights reserved.
     </div>
 </footer>
+{/block}
 
 <script>
-    // Flash messages auto-dismiss
-    document.querySelectorAll('[id^="flash-"]').forEach(el => {
+document.querySelectorAll('[id^="flash-"]').forEach(el => {
         setTimeout(() => { el.style.transition = 'opacity 0.5s'; el.style.opacity = '0'; }, 3000);
         setTimeout(() => el.remove(), 3500);
     });
 
-    // Dropdown menus
-    function initDropdown(btnId, menuId) {
+function initDropdown(btnId, menuId) {
         const btn = document.getElementById(btnId);
         const menu = document.getElementById(menuId);
         if (!btn || !menu) return;
@@ -180,8 +170,7 @@
     initDropdown('user-menu-btn', 'user-menu');
     initDropdown('admin-menu-btn', 'admin-menu');
 
-    // Logo: smooth scroll on homepage, navigate elsewhere
-    const logoLink = document.getElementById('logo-link');
+const logoLink = document.getElementById('logo-link');
     if (logoLink) {
         logoLink.addEventListener('click', e => {
             if (window.location.pathname === '/' || window.location.pathname === '') {
@@ -191,8 +180,7 @@
         });
     }
 
-    // Search overlay
-    const searchBtn = document.getElementById('search-btn');
+const searchBtn = document.getElementById('search-btn');
     const searchClose = document.getElementById('search-close');
     const searchOverlay = document.getElementById('search-overlay');
     const searchInput = document.getElementById('search-input');
@@ -218,8 +206,7 @@
     if (searchClose) searchClose.addEventListener('click', closeSearch);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
 
-    // Search: collect all product cards from the page
-    function getProducts() {
+function getProducts() {
         return [...document.querySelectorAll('[data-product-name]')].map(el => ({
             name: el.dataset.productName,
             price: el.dataset.productPrice,

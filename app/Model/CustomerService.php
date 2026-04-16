@@ -17,7 +17,6 @@ class CustomerService
     }
 
     /**
-     * Uloží objednávku i položky, vrátí ID objednávky.
      * @param array<string, mixed> $data
      * @param array<int, array{shoeId: int, size: float, name: string, price: int, img: string}> $items
      */

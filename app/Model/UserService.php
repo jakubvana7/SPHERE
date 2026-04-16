@@ -38,7 +38,6 @@ class UserService
         return $this->db->table('users')->where('email', $email)->fetch();
     }
 
-    /** Save shipping/contact info on the user record so it pre-fills next time */
     public function updateProfile(int $id, array $data): void
     {
         $this->db->table('users')->get($id)?->update([
@@ -51,7 +50,6 @@ class UserService
         ]);
     }
 
-    /** Vrátí objednávky uživatele i s položkami */
     public function getOrders(int $userId): array
     {
         $orders = $this->db->table('zakaznik')

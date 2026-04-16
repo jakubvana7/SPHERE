@@ -1,15 +1,6 @@
--- SPHERE e-shop — init schema + seed data (MySQL 8.0)
--- Opravené schéma oproti originálu:
---   • zakaznik: varchar(11) → správné délky, card data odstraněna, přidán payment_method
---   • boty: beze změny (data OK)
---   • kosik: zachováno pro kompatibilitu (cart je nyní session-based)
-
 SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 
--- --------------------------------------------------------
--- boty (shoes)
--- --------------------------------------------------------
 CREATE TABLE `boty` (
   `IDB`       int          NOT NULL AUTO_INCREMENT,
   `shoeName`  varchar(2000) NOT NULL,
@@ -84,9 +75,6 @@ INSERT INTO `boty` (`IDB`, `shoeName`, `popisek`, `price`, `img1`, `img2`, `img3
      'Step into high fashion with the Off-White x Wmns Air Jordan 4 Retro SP ''Sail''. This collaboration offers a fresh take on the classic silhouette with a deconstructed leather build.',
      1500, './images/jordan4-offwhite-1.webp', './images/jordan4-offwhite-2.webp', './images/jordan4-offwhite-3.webp');
 
--- --------------------------------------------------------
--- kosik (legacy cart — kept for schema compatibility)
--- --------------------------------------------------------
 CREATE TABLE `kosik` (
   `idK` int NOT NULL AUTO_INCREMENT,
   `idB` int NOT NULL,
@@ -95,9 +83,6 @@ CREATE TABLE `kosik` (
   KEY `idB` (`idB`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- zakaznik (customers / orders) — opravené sloupce
--- --------------------------------------------------------
 CREATE TABLE `zakaznik` (
   `idZ`            int          NOT NULL AUTO_INCREMENT,
   `Cname`          varchar(100) NOT NULL,
@@ -110,14 +95,11 @@ CREATE TABLE `zakaznik` (
   `country`        varchar(100) NOT NULL,
   `zip`            varchar(20)  NOT NULL,
   `payment_method` varchar(50)  DEFAULT NULL,
-  `user_id`       int          DEFAULT NULL,
+  `user_id`        int          DEFAULT NULL,
   `created_at`     datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`idZ`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- objednavka (orders — unused, kept for legacy)
--- --------------------------------------------------------
 CREATE TABLE `objednavka` (
   `idO` int NOT NULL AUTO_INCREMENT,
   `idZ` int NOT NULL,
@@ -125,9 +107,6 @@ CREATE TABLE `objednavka` (
   KEY `idZ` (`idZ`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- users (zákaznické účty)
--- --------------------------------------------------------
 CREATE TABLE `users` (
   `id`         int          NOT NULL AUTO_INCREMENT,
   `name`       varchar(100) NOT NULL,
@@ -144,9 +123,6 @@ CREATE TABLE `users` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- order_items (položky objednávky)
--- --------------------------------------------------------
 CREATE TABLE `order_items` (
   `id`        int          NOT NULL AUTO_INCREMENT,
   `order_id`  int          NOT NULL,

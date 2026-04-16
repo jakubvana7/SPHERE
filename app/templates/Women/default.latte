@@ -3,21 +3,54 @@
 {block content}
 <div class="max-w-7xl mx-auto px-6 py-16">
 
-    <div class="mb-12">
+    <div class="mb-10">
         <p class="text-[11px] font-bold tracking-[0.35em] uppercase text-gray-400 mb-2">Collection</p>
         <h1 class="text-4xl font-black tracking-tight">Women's</h1>
     </div>
 
-    {var $shoeList = $shoes->fetchAll()}
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
+    {* ── Filter bar ── *}
+    <div class="flex flex-wrap items-center gap-3 mb-10 pb-6 border-b border-gray-100" id="filter-bar">
 
-        {* Featured first — spans 2 cols *}
-        {foreach $shoeList as $idx => $shoe}
+        {* Sort *}
+        <div class="flex items-center gap-2 mr-4">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400">Sort</span>
+            <button data-sort="featured" class="filter-sort-btn active-sort text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-black bg-black text-white transition-colors">Featured</button>
+            <button data-sort="asc"      class="filter-sort-btn text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-gray-200 hover:border-black transition-colors">Price ↑</button>
+            <button data-sort="desc"     class="filter-sort-btn text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-gray-200 hover:border-black transition-colors">Price ↓</button>
+        </div>
+
+        {* Price range *}
+        <div class="flex items-center gap-2 mr-4">
+            <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-400">Price</span>
+            <button data-price="all"  class="filter-price-btn active-price text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-black bg-black text-white transition-colors">All</button>
+            <button data-price="low"  class="filter-price-btn text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-gray-200 hover:border-black transition-colors">Under €200</button>
+            <button data-price="mid"  class="filter-price-btn text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-gray-200 hover:border-black transition-colors">€200–€600</button>
+            <button data-price="high" class="filter-price-btn text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-gray-200 hover:border-black transition-colors">Over €600</button>
+        </div>
+
+        {* Availability *}
+        <button id="avail-toggle" data-avail="all"
+                class="text-[11px] font-bold tracking-[0.15em] uppercase px-4 py-2 border border-gray-200 hover:border-black transition-colors ml-auto">
+            Available Only
+        </button>
+
+        {* Result count *}
+        <span id="result-count" class="text-[11px] text-gray-400 tracking-wider"></span>
+    </div>
+
+    {var $shoeList = $shoes->fetchAll()}
+
+<p id="no-results" class="hidden text-sm text-gray-400 tracking-wider py-12 text-center">No products match the selected filters.</p>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10" id="shoe-grid">
+
+{foreach $shoeList as $idx => $shoe}
         {if $idx === 0}
         <a href="{link Product:detail $shoe->IDB}"
-           class="group block col-span-2 {if !$shoe->available}opacity-40{/if}"
+           class="group block col-span-2 {if !$shoe->available}opacity-40{/if} shoe-card"
            data-product-name="{$shoe->shoeName}" data-product-price="{$shoe->price}"
-           data-product-href="{link Product:detail $shoe->IDB}" data-product-img="{$shoe->img1|img}">
+           data-product-href="{link Product:detail $shoe->IDB}" data-product-img="{$shoe->img1|img}"
+           data-price="{$shoe->price}" data-available="{$shoe->available}" data-idx="0">
             <div class="relative bg-white border border-gray-100 overflow-hidden mb-3" style="aspect-ratio:2/1;">
                 {if !$shoe->available}
                 <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[9px] font-bold tracking-wider uppercase px-2 py-0.5">Unavailable</span>
@@ -29,12 +62,12 @@
             <p class="text-sm text-gray-400 font-light">{$shoe->price} €</p>
         </a>
 
-        {* Rest — normal cards *}
-        {else}
+{else}
         <a href="{link Product:detail $shoe->IDB}"
-           class="group block {if !$shoe->available}opacity-40{/if}"
+           class="group block {if !$shoe->available}opacity-40{/if} shoe-card"
            data-product-name="{$shoe->shoeName}" data-product-price="{$shoe->price}"
-           data-product-href="{link Product:detail $shoe->IDB}" data-product-img="{$shoe->img1|img}">
+           data-product-href="{link Product:detail $shoe->IDB}" data-product-img="{$shoe->img1|img}"
+           data-price="{$shoe->price}" data-available="{$shoe->available}" data-idx="{$idx}">
             <div class="relative bg-white border border-gray-100 aspect-square overflow-hidden mb-3">
                 {if !$shoe->available}
                 <span class="absolute top-2 left-2 z-10 bg-red-500 text-white text-[9px] font-bold tracking-wider uppercase px-2 py-0.5">Unavailable</span>
@@ -50,4 +83,93 @@
 
     </div>
 </div>
+
+<script>
+(function() {
+    const grid = document.getElementById('shoe-grid');
+    const cards = [...document.querySelectorAll('.shoe-card')];
+    const noResults = document.getElementById('no-results');
+    const resultCount = document.getElementById('result-count');
+
+    let currentSort = 'featured';
+    let currentPrice = 'all';
+    let availOnly = false;
+
+    function applyFilters() {
+        let visible = cards.filter(c => {
+            const price = parseInt(c.dataset.price, 10);
+            const avail = c.dataset.available === '1';
+            if (availOnly && !avail) return false;
+            if (currentPrice === 'low'  && price >= 200) return false;
+            if (currentPrice === 'mid'  && (price < 200 || price > 600)) return false;
+            if (currentPrice === 'high' && price <= 600) return false;
+            return true;
+        });
+
+        // Sort
+        if (currentSort === 'asc') {
+            visible.sort((a, b) => parseInt(a.dataset.price) - parseInt(b.dataset.price));
+        } else if (currentSort === 'desc') {
+            visible.sort((a, b) => parseInt(b.dataset.price) - parseInt(a.dataset.price));
+        } else {
+            visible.sort((a, b) => parseInt(a.dataset.idx) - parseInt(b.dataset.idx));
+        }
+
+        // Hide all, re-append visible in order
+        cards.forEach(c => { c.style.display = 'none'; c.classList.remove('col-span-2'); });
+        visible.forEach((c, i) => {
+            c.style.display = '';
+            // Featured (first visible in default sort) gets wide span only when sort=featured
+            if (currentSort === 'featured' && i === 0) {
+                c.classList.add('col-span-2');
+            }
+            grid.appendChild(c);
+        });
+
+        const count = visible.length;
+        resultCount.textContent = count + ' product' + (count !== 1 ? 's' : '');
+        noResults.classList.toggle('hidden', count > 0);
+    }
+
+    // Sort buttons
+    document.querySelectorAll('.filter-sort-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentSort = btn.dataset.sort;
+            document.querySelectorAll('.filter-sort-btn').forEach(b => {
+                b.classList.remove('bg-black', 'text-white', 'border-black', 'active-sort');
+                b.classList.add('border-gray-200');
+            });
+            btn.classList.add('bg-black', 'text-white', 'border-black', 'active-sort');
+            btn.classList.remove('border-gray-200');
+            applyFilters();
+        });
+    });
+
+    // Price buttons
+    document.querySelectorAll('.filter-price-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentPrice = btn.dataset.price;
+            document.querySelectorAll('.filter-price-btn').forEach(b => {
+                b.classList.remove('bg-black', 'text-white', 'border-black', 'active-price');
+                b.classList.add('border-gray-200');
+            });
+            btn.classList.add('bg-black', 'text-white', 'border-black', 'active-price');
+            btn.classList.remove('border-gray-200');
+            applyFilters();
+        });
+    });
+
+    // Availability toggle
+    document.getElementById('avail-toggle').addEventListener('click', function() {
+        availOnly = !availOnly;
+        this.classList.toggle('bg-black', availOnly);
+        this.classList.toggle('text-white', availOnly);
+        this.classList.toggle('border-black', availOnly);
+        this.classList.toggle('border-gray-200', !availOnly);
+        applyFilters();
+    });
+
+    applyFilters();
+})();
+</script>
 {/block}

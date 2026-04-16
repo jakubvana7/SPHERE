@@ -19,8 +19,6 @@ class ShoeService
         private readonly Explorer $db,
     ) {}
 
-    // ── Veřejné dotazy (všechny produkty — unavailable = zašedlé) ──────────
-
     public function getMen(): Selection
     {
         return $this->db->table('boty')
@@ -45,9 +43,6 @@ class ShoeService
         return (int) $this->db->table('boty')->sum('price');
     }
 
-    // ── Velikosti ───────────────────────────────────────────────────────────
-
-    /** Všechny velikosti produktu se stavem skladu */
     public function getSizes(int $shoeId): array
     {
         return $this->db->table('shoe_sizes')
@@ -56,7 +51,6 @@ class ShoeService
             ->fetchAll();
     }
 
-    /** Pouze velikosti s dostupným skladem (stock > 0) */
     public function getAvailableSizes(int $shoeId): array
     {
         return $this->db->table('shoe_sizes')
@@ -65,7 +59,6 @@ class ShoeService
             ->fetchAll();
     }
 
-    /** Inicializuje výchozí velikosti, pokud produkt žádné nemá */
     public function ensureDefaultSizes(int $shoeId): void
     {
         $existing = $this->db->table('shoe_sizes')->where('shoe_id', $shoeId)->count('*');
@@ -81,13 +74,10 @@ class ShoeService
         }
     }
 
-    /** Aktualizuje sklad jedné velikosti */
     public function updateSizeStock(int $sizeId, int $stock): void
     {
         $this->db->table('shoe_sizes')->get($sizeId)?->update(['stock' => max(0, $stock)]);
     }
-
-    // ── Admin CRUD ──────────────────────────────────────────────────────────
 
     public function getAll(): Selection
     {

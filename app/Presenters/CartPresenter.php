@@ -26,7 +26,6 @@ final class CartPresenter extends BasePresenter
         $this->template->shipping = $shipping;
         $this->template->total    = $subtotal + $shipping;
 
-        // Pre-fill form for logged-in customers
         if ($this->getUser()->isLoggedIn() && !$this->getUser()->isInRole('admin')) {
             $userId  = (int) $this->getUser()->getId();
             $profile = $this->userService->getById($userId);
@@ -38,7 +37,6 @@ final class CartPresenter extends BasePresenter
                 'email'   => $profile->email ?? '',
             ];
 
-            // Fill saved shipping info if present
             if ($profile->phone)    $defaults['phone']    = $profile->phone;
             if ($profile->address1) $defaults['address1'] = $profile->address1;
             if ($profile->address2) $defaults['address2'] = $profile->address2;
@@ -172,7 +170,6 @@ final class CartPresenter extends BasePresenter
             $userId,
         );
 
-        // Save shipping info to user profile for next time
         if ($userId !== null) {
             $this->userService->updateProfile($userId, [
                 'phone'    => $values->phone,

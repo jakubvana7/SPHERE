@@ -20,8 +20,6 @@ final class AdminPresenter extends BasePresenter
         }
     }
 
-    // ── Default — přehled produktů ─────────────────────────────────────────
-
     public function renderDefault(): void
     {
         $this->template->shoes = $this->shoeService->getAll();
@@ -40,21 +38,17 @@ final class AdminPresenter extends BasePresenter
         $this->redirect('Admin:default');
     }
 
-    // ── Add ────────────────────────────────────────────────────────────────
-
     public function renderAdd(): void
     {
         $this->template->shoe  = null;
         $this->template->sizes = [];
     }
 
-    // ── Edit ───────────────────────────────────────────────────────────────
-
     public function renderEdit(int $id): void
     {
         $shoe = $this->shoeService->getById($id);
         if (!$shoe) {
-            $this->error('Produkt nenalezen.', 404);
+            $this->error('Product not found.', 404);
         }
 
         $this->shoeService->ensureDefaultSizes($id);
@@ -73,8 +67,6 @@ final class AdminPresenter extends BasePresenter
             'available' => (bool) $shoe->available,
         ]);
     }
-
-    // ── Produkt form ───────────────────────────────────────────────────────
 
     protected function createComponentProductForm(): Form
     {
@@ -142,8 +134,6 @@ final class AdminPresenter extends BasePresenter
             $this->redirect('Admin:edit', $new->IDB);
         }
     }
-
-    // ── Sklad velikostí form ───────────────────────────────────────────────
 
     protected function createComponentSizesForm(): Form
     {
