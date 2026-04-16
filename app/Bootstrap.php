@@ -21,7 +21,13 @@ class Bootstrap
             ->register();
 
         $configurator->addDynamicParameters([
-            'env' => getenv(),
+            'env' => array_merge([
+                'DB_HOST'        => '127.0.0.1',
+                'DB_NAME'        => 'vanaj',
+                'DB_USER'        => 'root',
+                'DB_PASSWORD'    => '',
+                'ADMIN_PASSWORD' => 'admin123',
+            ], getenv()),
         ]);
 
         $configurator->addConfig($appDir . '/config/common.neon');
