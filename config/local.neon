@@ -1,7 +1,4 @@
-# Local development overrides (not committed to git)
-# Uncomment and adjust only when running outside Docker (e.g. XAMPP):
-#
-# database:
-#     dsn: 'mysql:host=localhost;dbname=vanaj;charset=utf8mb4'
-#     user: root
-#     password: ''
+database:
+    dsn: 'mysql:host=127.0.0.1;dbname=vanaj;charset=utf8mb4'
+    user: root
+    password: ''
